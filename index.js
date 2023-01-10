@@ -9,6 +9,11 @@ const commands=[
 		name_localizations:{"ja":"BOTの結果を削除"},
 		type:ApplicationCommandType.Message,
 	},
+	{
+		name:"Pin message",
+		name_localizations:{"ja":"ピン留め(on/off)"},
+		type:ApplicationCommandType.Message,
+	},
 ];
 async function _set_command(guild) {
 	console.log("コマンドを登録しました:" + guild.id + "(" + guild.name + ")" );
@@ -51,12 +56,57 @@ async function _contextmenu_delete_bot_message(interaction) {
 		}
 	);
 }
+async function _contextmenu_pin_message(interaction) {
+	const message = interaction.options.getMessage("message");
+	if (message.pinned) {
+		try {
+			message.unpin();
+			await interaction.reply(
+				{
+					content: "ピン留め解除しました\n" + message.url,
+				}
+			);
+		} catch (error) {
+			console.dir(interaction.user);
+			console.dir(message);
+			console.log(error);
+			await interaction.reply(
+				{
+					content:"ピン留め解除に失敗しました",
+					flags:64,
+				}
+			);
+		}		
+	} else {
+		try {
+			message.pin();
+			await interaction.reply(
+				{
+					content:"ピン留めしました\n" + message.url,
+				}
+			);
+		} catch (error) {
+			console.dir(interaction.user);
+			console.dir(message);
+			console.log(error);
+			await interaction.reply(
+				{
+					content:"ピン留めに失敗しました",
+					flags:64,
+				}
+			);
+		}		
+	}
 
+}
 client.on('interactionCreate', async interaction => { 
 	if (interaction.isContextMenuCommand()) {
 		const { commandName } = interaction;
 		if (commandName == commands[0].name) {
 			await _contextmenu_delete_bot_message(interaction);
+		}
+		if (commandName == commands[1].name) {
+			await _contextmenu_pin_message(interaction);
 		}
 	}
 });
