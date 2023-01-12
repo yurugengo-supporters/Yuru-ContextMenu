@@ -73,12 +73,16 @@ async function _contextmenu_pin_message(interaction) {
 			await interaction.reply(
 				{
 					content:"ピン留め解除に失敗しました",
-					flags:64,
+					ephemeral:true,
 				}
 			);
 		}		
 	} else {
 		try {
+			if (message.system) {
+				await interaction.reply({content:"システムメッセージはピン留めできません" ,ephemeral:true});
+				return;
+			}
 			message.pin();
 			await interaction.reply(
 				{
@@ -92,7 +96,7 @@ async function _contextmenu_pin_message(interaction) {
 			await interaction.reply(
 				{
 					content:"ピン留めに失敗しました",
-					flags:64,
+					ephemeral:true,
 				}
 			);
 		}		
